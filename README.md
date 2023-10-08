@@ -1,4 +1,4 @@
-This is demo for practice
+This is practice
 
 Addressbook Tutorial demo
 ====================
