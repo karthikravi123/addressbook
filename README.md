@@ -1,4 +1,3 @@
-This is practice
 
 Addressbook Tutorial demo
 ====================
