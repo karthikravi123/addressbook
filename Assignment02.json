@@ -1,0 +1,120 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Resources": {
+        "myVPC": {
+            "Type": "AWS::EC2::VPC",
+            "Properties": {
+                "CidrBlock": "10.0.0.0/24",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "CfVPC-Sudip"
+                    }
+                ]
+            }
+        },
+        "myPubSub": {
+            "Type": "AWS::EC2::Subnet",
+            "Properties": {
+                "VpcId": {
+                    "Ref": "myVPC"
+                },
+                "CidrBlock": "10.0.0.0/28",
+                "MapPublicIpOnLaunch": "True",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "CfPubSub-Sudip"
+                    }
+                ]
+            }
+        },
+        "myIGW": {
+            "Type": "AWS::EC2::InternetGateway",
+            "Properties": {
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "CfIGW-Sudip"
+                    }
+                ]
+            }
+        },
+        "myIGWAttach": {
+            "Type": "AWS::EC2::VPCGatewayAttachment",
+            "Properties": {
+                "InternetGatewayId": {
+                    "Ref": "myIGW"
+                },
+                "VpcId": {
+                    "Ref": "myVPC"
+                }
+            }
+        },
+        "myPubRT": {
+            "Type": "AWS::EC2::RouteTable",
+            "Properties": {
+                "VpcId": {
+                    "Ref": "myVPC"
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "CfPubRT-Sudip"
+                    }
+                ]
+            }
+        },
+        "myRoute": {
+            "Type": "AWS::EC2::Route",
+            "Properties": {
+                "DestinationCidrBlock": "0.0.0.0/0",
+                "GatewayId": {
+                    "Ref": "myIGW"
+                },
+                "RouteTableId": {
+                    "Ref": "myPubRT"
+                }
+            }
+        },
+        "mySA": {
+            "Type": "AWS::EC2::SubnetRouteTableAssociation",
+            "Properties": {
+                "RouteTableId": {
+                    "Ref": "myPubRT"
+                },
+                "SubnetId": {
+                    "Ref": "myPubSub"
+                }
+            }
+        },
+        "myKey": {
+            "Type": "AWS::EC2::KeyPair",
+            "Properties": {
+                "KeyName": "CfKey-Sudip",
+                "KeyType":"rsa",
+                "KeyFormat": "pem",
+                "PublicKeyMaterial":"ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCwCnsaSg7w5ruLEwHQvClaJXE58J3FLl/tZ/1vVYRGPOPgFSSQ5SJGvvl0cNL18uB2jVuEtgLoL0I/vpxvyncK+056RDhSwQql1xTSQBwby6JYD+KVTndCAmIqbMVsx5ENz4mN+trUzb2WKioKLDas5wf2P+Lrk247UNsVog/KlwC1/bK5yNgSU9C5OaTqIFJodXwCXywSdSMpP70pR+lFDKpFV45etn+M/zyIDQtA1PSf4gkhqjkwThRDSZ+XlyN7XkmIVAGmyhTRHwfw3LUgOIXfPXnCjZ6/r/f+hgkn3WhaMRD2Ik8nfAtf0rINSbRZdlGpWHiHLU1YBftG+LSX rsa-key-20230729"
+            }
+        },
+        "myEC2Instance": {
+            "Type": "AWS::EC2::Instance",
+            "Properties": {
+                "SubnetId": {
+                    "Ref": "myPubSub"
+                },
+                "ImageId": "ami-0ded8326293d3201b",
+                "InstanceType": "t2.micro",
+                "KeyName": {
+                    "Ref": "myKey"
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "CfInstance-Sudip"
+                    }
+                ]
+            }
+        }
+    }
+}
